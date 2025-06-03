@@ -3,6 +3,7 @@ use crate::common::file_tree_drive;
 use crate::common::file_tree_drive::FileTreeDrive;
 use crate::common::hub_helper;
 use crate::common::md5_writer::Md5Writer;
+use crate::common::path_helper;
 use crate::files;
 use crate::hub::Hub;
 use async_recursion::async_recursion;
@@ -121,9 +122,10 @@ pub async fn download_regular(
             let file_name = file.name.clone().ok_or(Error::MissingFileName)?;
             let root_path = config.canonical_destination_root()?;
             let abs_file_path = root_path.join(&file_name);
+            let sanitized_path = path_helper::sanitize_path(&abs_file_path);
 
             println!("Downloading {}", file_name);
-            save_body_to_file(body, &abs_file_path, file.md5_checksum.clone()).await?;
+            save_body_to_file(body, &sanitized_path, file.md5_checksum.clone()).await?;
             println!("Successfully downloaded {}", file_name);
         }
     }
@@ -162,8 +164,9 @@ pub async fn download_directory(
         for file in folder.files() {
             let file_path = file.relative_path();
             let abs_file_path = root_path.join(&file_path);
+            let sanitized_path = path_helper::sanitize_path(&abs_file_path);
 
-            if local_file_is_identical(&abs_file_path, &file) {
+            if local_file_is_identical(&sanitized_path, &file) {
                 continue;
             }
 
@@ -172,7 +175,7 @@ pub async fn download_directory(
                 .map_err(Error::DownloadFile)?;
 
             println!("Downloading file '{}'", file_path.display());
-            save_body_to_file(body, &abs_file_path, file.md5.clone()).await?;
+            save_body_to_file(body, &sanitized_path, file.md5.clone()).await?;
         }
     }
 

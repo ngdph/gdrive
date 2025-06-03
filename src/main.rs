@@ -17,6 +17,8 @@ use mime::Mime;
 use std::error::Error;
 use std::path::PathBuf;
 
+use crate::common::path_helper;
+
 #[derive(Parser)]
 #[command(author, version, about, long_about = None, disable_version_flag = true)]
 struct Cli {
@@ -649,10 +651,12 @@ async fn main() {
                         files::export::ExistingFileAction::Abort
                     };
 
+                    let sanitized_path = path_helper::sanitize_path(&file_path);
+
                     files::export(files::export::Config {
                         file_id,
-                        file_path,
                         existing_file_action,
+                        file_path: sanitized_path,
                     })
                     .await
                     .unwrap_or_else(handle_error)

@@ -11,3 +11,4 @@ pub mod md5_writer;
 pub mod permission;
 pub mod table;
 pub mod file_helper;
+pub mod path_helper;
