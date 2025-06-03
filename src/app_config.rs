@@ -195,11 +195,11 @@ pub struct Secret {
     pub client_secret: String,
 }
 
-pub fn set_file_permissions(path: &PathBuf) -> Result<(), io::Error> {
+pub fn set_file_permissions(_path: &PathBuf) -> Result<(), io::Error> {
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        fs::set_permissions(path, fs::Permissions::from_mode(0o600))?;
+        fs::set_permissions(_path, fs::Permissions::from_mode(0o600))?;
     }
 
     Ok(())
